@@ -1,10 +1,16 @@
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
+
+
 def getCycles(graph):
-    """Finds cycles by recursively removing edges"""
-    graph = graph.copy()
-    cycles = []
+    """Returns an array of digraphs containing cycles. Each digraph is represented as a dictionary mapping
+    vertices to its neighbouring vertices.
+
+    """
 
     def getCycle(graph):
-        """Return the offending cycle and last vertex visited if the directed
+        """Return the offending cycle and last vertex visitsed if the directed
         graph has a cycle. The graph must be represented as a dictionary mapping
         vertices to iterables of neighbouring vertices. For example:
 
@@ -36,13 +42,23 @@ def getCycles(graph):
                 stack.pop()
         return False
 
+    cycles = []
+
     cycleTup = getCycle(graph)
 
     while cycleTup:
-        cycle = cycleTup[0]
-        vertex = cycleTup[1]
+        cycle, vertex = cycleTup
+        subgraph = graph.copy()
 
-        cycles.append(cycle)
+        for key in subgraph.keys():
+            if key not in cycle:
+                del subgraph[key]
+
+        for key in subgraph.keys():
+            if key in cycle:
+                subgraph[key] = [v for v in subgraph[key] if v in cycle]
+
+        cycles.append(subgraph)
 
         graph[cycle[-1]] = [x for x in graph[cycle[-1]] if x is not vertex]
 
@@ -51,15 +67,18 @@ def getCycles(graph):
     return cycles
 
 
-graph = {
-    1: (2,),
-    2: (3, 4),
-    3: (1,),
-    4: (8,),
-    5: (3,),
-    6: (1,),
-    7: (6,),
-    8: (7,)
-}
+if __name__ == "__main__":
+    graph = {
+        1: (2,),
+        2: (3, 4),
+        3: (1,),
+        4: (8,),
+        5: (3,),
+        6: (1,),
+        7: (6,),
+        8: (7,)
+    }
 
-print(getCycles(graph))
+    cycles = getCycles(graph)
+
+    pp.pprint(cycles)

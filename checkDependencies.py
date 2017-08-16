@@ -1,8 +1,9 @@
 import sys
+import pprint
 from cyclic import getCycles
 
 
-def absolutifyPath(relativePath, referencePoint):
+def getAbsolutePath(relativePath, referencePoint):
     """Given the file's relative path, and point of reference return
     its absolute path
 
@@ -21,7 +22,7 @@ def absolutifyPath(relativePath, referencePoint):
         return referencePoint + relativePath
 
 
-def genGraph(totalString, ignored):
+def generateGraph(totalString, ignored):
     """Creates a dependency graph given a string with the following structure:
 
     filename::dependencies@@file2::dependences
@@ -58,7 +59,7 @@ def genGraph(totalString, ignored):
                 continue
 
             if '/' in rlParsed:
-                rlParsed = absolutifyPath(rlParsed, fileName)
+                rlParsed = getAbsolutePath(rlParsed, fileName)
 
             # Add .js extension to dependency file name
             if rlParsed[-3:] is not ".js":
@@ -98,4 +99,10 @@ else:
     f.close()
 
 
-print(getCycles(genGraph(totalString, ignored)))
+cycles = getCycles(generateGraph(totalString, ignored))
+
+pp = pprint.PrettyPrinter(indent=4)
+
+for cycle in cycles:
+    pp.pprint(cycle)
+    print('\n')
